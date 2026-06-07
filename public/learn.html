@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZephyrAuth — Learn Auth</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="learn-body">
+<canvas id="bgCanvas"></canvas>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <div class="nav-brand-icon"><i class="fa-solid fa-shield-halved"></i></div>
+    Zephyr<span class="hl">Auth</span>
+  </div>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link"><i class="fa-solid fa-right-to-bracket"></i> Sign In</a>
+    <a href="dashboard.html" class="nav-link"><i class="fa-solid fa-house"></i> Dashboard</a>
+    <a href="learn.html" class="nav-link active"><i class="fa-solid fa-book-open"></i> Learn</a>
+  </div>
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+      <i class="fa-solid fa-moon" id="moonIcon"></i>
+      <i class="fa-solid fa-sun" id="sunIcon" style="display:none"></i>
+    </button>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="learn-hero page-enter">
+  <div class="chip-label" style="margin-bottom:12px;color:var(--accent)">
+    <i class="fa-solid fa-graduation-cap"></i>&nbsp; DEVELOPER LEARNING HUB
+  </div>
+  <h1>Authentication &amp;<br>Authorization, Demystified</h1>
+  <p>Explained in plain English. No jargon walls, no hand-waving. Understand exactly how passwords, tokens, and protected routes work — using the actual code in this app.</p>
+  <div class="learn-hero-tags">
+    <span class="badge badge-blue"><i class="fa-solid fa-key"></i> JWT</span>
+    <span class="badge badge-purple"><i class="fa-solid fa-lock"></i> bcrypt</span>
+    <span class="badge badge-green"><i class="fa-solid fa-shield-halved"></i> Auth Middleware</span>
+    <span class="badge badge-orange"><i class="fa-solid fa-cookie-bite"></i> Sessions vs Tokens</span>
+    <span class="badge badge-red"><i class="fa-solid fa-bug-slash"></i> Security Threats</span>
+  </div>
+</div>
+
+<!-- Concept Grid -->
+<div class="learn-grid">
+
+  <!-- 1. Auth vs Authorization -->
+  <div class="concept-card">
+    <div class="concept-icon-wrap si-cyan"><i class="fa-solid fa-id-badge"></i></div>
+    <h3>Authentication vs Authorization</h3>
+    <div class="desc">Two words people mix up all the time. Short answer: <strong>AuthN = Who are you?</strong> &nbsp;·&nbsp; <strong>AuthZ = What can you do?</strong></div>
+    <div class="point-grid">
+      <div class="point-item">
+        <h4><i class="fa-solid fa-id-card" style="margin-right:5px"></i>Authentication (AuthN)</h4>
+        <p>Proving you are who you say you are. Like showing your ID at a club entrance. Email + password → server checks → you're authenticated.</p>
+      </div>
+      <div class="point-item">
+        <h4><i class="fa-solid fa-user-shield" style="margin-right:5px"></i>Authorization (AuthZ)</h4>
+        <p>Once you're in — what are you <em>allowed</em> to do? An admin can delete things. A regular user can't. Different people, different permissions.</p>
+      </div>
+      <div class="point-item">
+        <h4><i class="fa-solid fa-code" style="margin-right:5px"></i>In This App (AuthN)</h4>
+        <p>You type email + password → server checks them → hands you a JWT token. That whole process is authentication.</p>
+      </div>
+      <div class="point-item">
+        <h4><i class="fa-solid fa-code" style="margin-right:5px"></i>In This App (AuthZ)</h4>
+        <p>The <code>protect</code> middleware reads your token before any locked route. No valid token = 401 error. That's authorization enforcing your permission.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. JWT -->
+  <div class="concept-card">
+    <div class="concept-icon-wrap si-yellow"><i class="fa-solid fa-key"></i></div>
+    <h3>JSON Web Tokens (JWT)</h3>
+    <div class="desc">A JWT is a signed ticket the server gives you after login. You carry it in your browser and show it on every protected request. Three parts separated by dots.</div>
+    <div class="code-block"><span class="cmt">// Three base64url-encoded parts, separated by dots</span>
+<span class="kw">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9</span>   <span class="cmt">// Header</span>
+<span class="kw">.</span>
+<span class="fn">eyJpZCI6IjY0YWJjLi4uIiwiZW1haWwiOiJ5b3VAZXhhbXBsZS5jb20ifQ</span>  <span class="cmt">// Payload</span>
+<span class="kw">.</span>
+<span class="str">SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</span>  <span class="cmt">// Signature</span></div>
+    <div class="point-grid" style="margin-top:14px">
+      <div class="point-item">
+        <h4>Header</h4>
+        <p>Just says which algorithm was used to sign the token (<code>HS256</code>). Base64 encoded — <em>not</em> encrypted. Anyone can read it.</p>
+      </div>
+      <div class="point-item">
+        <h4>Payload (Claims)</h4>
+        <p>Your actual data: user ID, email, when it was issued, when it expires. Also <strong>not encrypted</strong> — never put passwords or secrets in here.</p>
+      </div>
+      <div class="point-item">
+        <h4>Signature</h4>
+        <p>HMAC stamp of (header + payload) using your server's secret key. If anyone edits even one character of the token, this breaks and the server rejects it.</p>
+      </div>
+      <div class="point-item">
+        <h4>Stateless</h4>
+        <p>The server doesn't store anything about you. Your token IS the proof. Multiple servers can all verify the same token — no shared database needed.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. bcrypt -->
+  <div class="concept-card">
+    <div class="concept-icon-wrap si-green"><i class="fa-solid fa-lock"></i></div>
+    <h3>Password Hashing with bcrypt</h3>
+    <div class="desc">bcrypt scrambles your password into random-looking gibberish that can <strong>never</strong> be reversed. Even if your database gets hacked, attackers just see nonsense.</div>
+    <div class="code-block"><span class="cmt">// In authController.js</span>
+<span class="kw">const</span> salt = <span class="kw">await</span> bcrypt.<span class="fn">genSalt</span>(<span class="num">10</span>);          <span class="cmt">// 2^10 = 1024 rounds</span>
+<span class="kw">const</span> hash = <span class="kw">await</span> bcrypt.<span class="fn">hash</span>(password, salt); <span class="cmt">// "abc123" → "$2a$10$..."</span>
+
+<span class="cmt">// On login — compare entered password vs stored hash</span>
+<span class="kw">const</span> isMatch = <span class="kw">await</span> bcrypt.<span class="fn">compare</span>(entered, storedHash);</div>
+    <div class="point-grid" style="margin-top:14px">
+      <div class="point-item">
+        <h4>Why not MD5 / SHA256?</h4>
+        <p>They're too fast — modern GPUs can try billions of password guesses per second. bcrypt is intentionally slow, making that impractical.</p>
+      </div>
+      <div class="point-item">
+        <h4>Salt</h4>
+        <p>A random string mixed into your password before hashing. So even if two users have the same password, their stored hashes look completely different. Defeats pre-computed attack tables.</p>
+      </div>
+      <div class="point-item">
+        <h4>Cost Factor</h4>
+        <p>Cost=10 means 1024 hashing rounds. Each round makes brute-force attacks slower. Higher cost = safer but slower login. 10–12 is the sweet spot.</p>
+      </div>
+      <div class="point-item">
+        <h4>One-way</h4>
+        <p>There's no 'decrypt'. When you log in, bcrypt re-hashes what you typed and compares the two results. If they match — you're in. No reversal needed.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Sessions vs Tokens -->
+  <div class="concept-card">
+    <div class="concept-icon-wrap si-purple"><i class="fa-solid fa-arrows-left-right"></i></div>
+    <h3>Sessions vs Token-based Auth</h3>
+    <div class="desc">Two ways to keep users logged in after they authenticate. This app uses JWT tokens. Here's why that matters.</div>
+    <div class="point-grid">
+      <div class="point-item">
+        <h4><i class="fa-solid fa-server" style="margin-right:4px"></i>Session-based</h4>
+        <p>Server keeps a record of every logged-in user in a database. On each request, it looks you up. Works fine for a single server, but hard to scale.</p>
+      </div>
+      <div class="point-item">
+        <h4><i class="fa-solid fa-key" style="margin-right:4px"></i>Token-based (JWT)</h4>
+        <p>Server gives you a token and forgets about you. Every request proves itself with the token. Zero database lookup needed — just signature verification.</p>
+      </div>
+      <div class="point-item">
+        <h4>Session Pros</h4>
+        <p>Easy to instantly log someone out (just delete their session). Server has full control. Great for sensitive apps like banking.</p>
+      </div>
+      <div class="point-item">
+        <h4>JWT Pros</h4>
+        <p>Scales easily across multiple servers — no need to share session state. Perfect for APIs, mobile apps, and microservices.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Middleware -->
+  <div class="concept-card wide">
+    <div class="concept-icon-wrap si-orange"><i class="fa-solid fa-filter"></i></div>
+    <h3>Auth Middleware — How Protected Routes Work</h3>
+    <div class="desc">Middleware is just a function that runs <strong>before</strong> your route handler. Think of the <code>protect</code> function as a bouncer checking IDs at the door. Valid token? Come in. Expired or missing? 401, goodbye.</div>
+    <div class="code-block"><span class="cmt">// middleware/authMiddleware.js — exact code from this app</span>
+
+<span class="kw">const</span> protect = (req, res, next) => {
+
+  <span class="cmt">// 1. Extract token from "Authorization: Bearer &lt;token&gt;" header</span>
+  <span class="kw">const</span> authHeader = req.headers.authorization;
+  <span class="kw">if</span> (!authHeader || !authHeader.<span class="fn">startsWith</span>(<span class="str">"Bearer "</span>)) {
+    <span class="kw">return</span> res.<span class="fn">status</span>(<span class="num">401</span>).<span class="fn">json</span>({ message: <span class="str">"No token provided."</span> });
+  }
+
+  <span class="kw">const</span> token = authHeader.<span class="fn">split</span>(<span class="str">" "</span>)[<span class="num">1</span>]; <span class="cmt">// everything after "Bearer "</span>
+
+  <span class="cmt">// 2. Verify the token's signature using the secret</span>
+  <span class="kw">try</span> {
+    <span class="kw">const</span> decoded = jwt.<span class="fn">verify</span>(token, process.env.JWT_SECRET);
+    req.user = decoded; <span class="cmt">// { id, email } — attached for controllers to use</span>
+    <span class="fn">next</span>();              <span class="cmt">// valid token → proceed to controller</span>
+  } <span class="kw">catch</span> (error) {
+    <span class="kw">return</span> res.<span class="fn">status</span>(<span class="num">401</span>).<span class="fn">json</span>({ message: <span class="str">"Invalid or expired token."</span> });
+  }
+};</div>
+    <div class="point-grid" style="margin-top:14px">
+      <div class="point-item">
+        <h4>Why <code>next()</code>?</h4>
+        <p>Express routes are a chain. Middleware calls <code>next()</code> to pass control forward. If it doesn't call <code>next()</code>, the request stops right there.</p>
+      </div>
+      <div class="point-item">
+        <h4><code>req.user</code></h4>
+        <p>After verifying the JWT, the middleware attaches your user data to <code>req.user</code>. So the controller can get your user ID without hitting the database again.</p>
+      </div>
+      <div class="point-item">
+        <h4>Route Registration</h4>
+        <p><code>protect</code> is listed before <code>getProfile</code> in the route. Express runs them in order. If protect rejects the request, <code>getProfile</code> never even runs.</p>
+      </div>
+      <div class="point-item">
+        <h4>jwt.verify()</h4>
+        <p>Throws an error if the token is expired, has been modified, or was signed with a different secret. The catch block turns that into a clean 401 response automatically.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Security Threats -->
+  <div class="concept-card">
+    <div class="concept-icon-wrap si-red"><i class="fa-solid fa-bug-slash"></i></div>
+    <h3>Common Auth Vulnerabilities</h3>
+    <div class="desc">Knowing what can go wrong is the first step to building securely. These are the most common auth attacks and what stops them.</div>
+    <div class="point-grid">
+      <div class="point-item">
+        <h4><i class="fa-solid fa-skull-crossbones" style="color:var(--red);margin-right:4px"></i>XSS</h4>
+        <p>Malicious JavaScript injected into a page can steal your localStorage token. Fix: use HttpOnly cookies (JS can't touch them) and always sanitize user input.</p>
+      </div>
+      <div class="point-item">
+        <h4><i class="fa-solid fa-skull-crossbones" style="color:var(--red);margin-right:4px"></i>CSRF</h4>
+        <p>A fake website tricks your browser into making requests using your cookies. Fix: set <code>SameSite=Strict</code> on cookies so they don't go cross-site.</p>
+      </div>
+      <div class="point-item">
+        <h4><i class="fa-solid fa-skull-crossbones" style="color:var(--red);margin-right:4px"></i>JWT None Alg</h4>
+        <p>Attackers change the JWT header to <code>alg: none</code>, hoping the server skips signature checking. Fix: always whitelist allowed algorithms on the server.</p>
+      </div>
+      <div class="point-item">
+        <h4><i class="fa-solid fa-skull-crossbones" style="color:var(--red);margin-right:4px"></i>Brute Force</h4>
+        <p>Bots try millions of password combinations automatically. bcrypt slows each attempt down, but you should also add rate limiting and account lockout in production.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. Bearer Token pattern -->
+  <div class="concept-card">
+    <div class="concept-icon-wrap si-purple"><i class="fa-solid fa-paper-plane"></i></div>
+    <h3>Bearer Token Pattern</h3>
+    <div class="desc">How the client sends its JWT with every protected request. You put it in a special header called <code>Authorization</code>. One line of code, every API call.</div>
+    <div class="code-block"><span class="cmt">// Every API call to a protected route</span>
+<span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'/api/users/profile'</span>, {
+  method: <span class="str">'GET'</span>,
+  headers: {
+    <span class="str">'Authorization'</span>: <span class="str">`Bearer ${</span>localStorage.<span class="fn">getItem</span>(<span class="str">'token'</span>)<span class="str">}`</span>,
+    <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>
+  }
+});</div>
+    <div class="point-grid" style="margin-top:14px">
+      <div class="point-item">
+        <h4>Why "Bearer"?</h4>
+        <p>It's a naming convention (RFC 6750). "Bearer" just means "whoever has this token is authorized." No username needed — the token is the key.</p>
+      </div>
+      <div class="point-item">
+        <h4>Header vs Cookie</h4>
+        <p>Cookies are sent automatically by the browser (CSRF risk). Headers must be set manually in JS. Using a header means you control exactly when and where the token is sent.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- JWT Playground -->
+  <div class="playground-card">
+    <div class="concept-icon-wrap si-yellow" style="margin-bottom:14px"><i class="fa-solid fa-flask"></i></div>
+    <h3>JWT Playground — Decode Any Token</h3>
+    <p>Paste any JWT below to decode its header and payload. <strong>No secret needed</strong> — the first two parts are just base64url encoded JSON.</p>
+    <textarea class="playground-input" id="playgroundInput" rows="3"
+      placeholder="Paste a JWT here: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."></textarea>
+    <button class="btn-ghost" id="playgroundDecodeBtn" style="margin-bottom:6px">
+      <i class="fa-solid fa-wand-magic-sparkles"></i> Decode Token
+    </button>
+    <div id="playgroundError" style="font-size:.75rem;color:var(--red);display:none;margin-bottom:10px">
+      <i class="fa-solid fa-circle-exclamation"></i> Invalid JWT — check your input.
+    </div>
+    <div class="playground-result hidden" id="playgroundResult">
+      <div class="jwt-col">
+        <div class="jwt-col-title jt-red"><i class="fa-solid fa-file-code"></i> Header</div>
+        <pre id="pgHeader" style="font-family:var(--fw-code);font-size:.73rem;color:var(--text);white-space:pre-wrap;word-break:break-all;line-height:1.6">—</pre>
+      </div>
+      <div class="jwt-col">
+        <div class="jwt-col-title jt-yellow"><i class="fa-solid fa-box-open"></i> Payload</div>
+        <pre id="pgPayload" style="font-family:var(--fw-code);font-size:.73rem;color:var(--text);white-space:pre-wrap;word-break:break-all;line-height:1.6">—</pre>
+      </div>
+      <div class="jwt-col">
+        <div class="jwt-col-title jt-green"><i class="fa-solid fa-stamp"></i> Signature</div>
+        <div id="pgSig" style="font-family:var(--fw-code);font-size:.73rem;color:var(--text3);line-height:1.5;word-break:break-all">—</div>
+        <div style="margin-top:10px;font-size:.72rem;color:var(--text3);line-height:1.5">
+          Signature cannot be verified without the server-side secret. Visit jwt.io to verify.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Glossary -->
+  <div class="glossary-card">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+      <div class="concept-icon-wrap si-cyan" style="margin-bottom:0"><i class="fa-solid fa-book"></i></div>
+      <div>
+        <h3 style="margin-bottom:2px">Auth Glossary</h3>
+        <div class="desc" style="margin-bottom:0">Quick-reference definitions for every term in this app.</div>
+      </div>
+    </div>
+    <dl>
+      <div class="gloss-term"><dt>JWT (JSON Web Token)</dt><dd>A signed ticket the server gives you after login. Three parts separated by dots: header, payload, signature. The server can verify it without any database lookup.</dd></div>
+      <div class="gloss-term"><dt>bcrypt</dt><dd>A one-way password scrambler designed to be intentionally slow. It uses a salt and a cost factor to make brute-force cracking take years instead of seconds.</dd></div>
+      <div class="gloss-term"><dt>Salt</dt><dd>A random string mixed in before hashing. Makes sure two users with the same password get different hashes in the database, so pre-computed attack tables are useless.</dd></div>
+      <div class="gloss-term"><dt>Bearer Token</dt><dd>The convention for sending JWTs in API requests. You put the token in the Authorization header with the word "Bearer" in front. Whoever holds the token gets access.</dd></div>
+      <div class="gloss-term"><dt>Middleware</dt><dd>Code that runs before your route handler. In Express.js, middleware functions have access to req and res and can either pass control forward (next()) or stop the request.</dd></div>
+      <div class="gloss-term"><dt>iat (Issued At)</dt><dd>A standard JWT claim. A Unix timestamp (seconds since 1970) saying exactly when the token was created.</dd></div>
+      <div class="gloss-term"><dt>exp (Expiration)</dt><dd>A standard JWT claim. Unix timestamp after which the token is expired and must be rejected. This app sets it to 1 day (86400 seconds) after login.</dd></div>
+      <div class="gloss-term"><dt>HttpOnly Cookie</dt><dd>A cookie that JavaScript cannot read — only the browser sends it automatically. Set with the HttpOnly flag in the Set-Cookie header. The most secure place to store auth tokens.</dd></div>
+      <div class="gloss-term"><dt>HMAC-SHA256</dt><dd>The signing algorithm this app uses for JWTs. It combines your secret key with SHA-256 hashing to produce a tamper-proof signature. Standard and widely trusted.</dd></div>
+      <div class="gloss-term"><dt>RBAC (Role-Based Access Control)</dt><dd>Instead of giving permissions to each user individually, you assign them to roles (admin, editor, viewer) and then assign users to roles. Much easier to manage at scale.</dd></div>
+      <div class="gloss-term"><dt>Refresh Token</dt><dd>A second, longer-lived token used to silently get a new access token when yours expires — so users don't get randomly logged out. Not in this demo, but used in production apps.</dd></div>
+      <div class="gloss-term"><dt>401 vs 403</dt><dd>401 = you're not logged in (no valid token). 403 = you're logged in but not allowed to do this. Same word "unauthorized" gets thrown around for both — don't mix them up.</dd></div>
+    </dl>
+  </div>
+
+</div><!-- /learn-grid -->
+
+<!-- Toast -->
+<div class="toast" id="toast" role="alert">
+  <div class="toast-dot" id="toastDot"></div>
+  <span id="toastMsg"></span>
+</div>
+
+<script src="js/learn.js"></script>
+</body>
+</html>

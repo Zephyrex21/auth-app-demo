@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZephyrAuth — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<canvas id="bgCanvas"></canvas>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-brand-icon"><i class="fa-solid fa-shield-halved"></i></div>
+    Zephyr<span class="hl">Auth</span>
+  </div>
+
+  <div class="sidebar-user">
+    <div class="sidebar-avatar" id="sidebarAvatar">?</div>
+    <div class="sidebar-user-name" id="sidebarName">Loading…</div>
+    <div class="sidebar-user-email" id="sidebarEmail">—</div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="sidebar-section">Main</div>
+    <div class="nav-item active" data-panel="overview">
+      <i class="fa-solid fa-house"></i> Overview
+    </div>
+    <div class="nav-item" data-panel="jwt">
+      <i class="fa-solid fa-key"></i> JWT Inspector
+    </div>
+    <div class="nav-item" data-panel="session">
+      <i class="fa-solid fa-clock-rotate-left"></i> Session &amp; Storage
+    </div>
+
+    <div class="sidebar-section">Security</div>
+    <div class="nav-item" data-panel="security">
+      <i class="fa-solid fa-shield-halved"></i> Security Info
+    </div>
+    <div class="nav-item" data-panel="api">
+      <i class="fa-solid fa-code"></i> API Reference
+    </div>
+
+    <div class="sidebar-section">Resources</div>
+    <a href="learn.html" class="nav-item">
+      <i class="fa-solid fa-book-open"></i> Learn Auth
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="sidebar-logout" id="logoutBtn">
+      <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+    </button>
+    <div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between;padding:0 3px">
+      <span style="font-size:.67rem;color:var(--text3)">Theme</span>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" style="width:30px;height:30px;border-radius:7px;font-size:.78rem">
+        <i class="fa-solid fa-moon" id="moonIcon"></i>
+        <i class="fa-solid fa-sun" id="sunIcon" style="display:none"></i>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<!-- ── MAIN ── -->
+<div class="dash-main">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <div>
+        <div class="topbar-title" id="topbarTitle">Overview</div>
+        <div style="font-size:.68rem;color:var(--text3);margin-top:1px" id="topbarSub">Your account at a glance</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <span class="badge badge-green" id="tokenStatusBadge">
+        <i class="fa-solid fa-circle" style="font-size:.45rem"></i> Token Active
+      </span>
+      <div class="nav-avatar-sm" id="topbarAvatar">?</div>
+    </div>
+  </header>
+
+  <!-- ────────────────── PANELS ────────────────── -->
+  <div class="panels">
+
+    <!-- ═══ OVERVIEW PANEL ═══ -->
+    <section class="panel active" id="panel-overview">
+      <div class="panel-heading">Your Profile</div>
+      <div class="panel-sub">Authenticated session details — live from your JWT &amp; MongoDB document.</div>
+
+      <!-- Profile header -->
+      <div class="profile-header">
+        <div class="profile-avatar-lg" id="profileAvatar">?</div>
+        <div class="profile-info">
+          <h2 id="profileName">Loading…</h2>
+          <p id="profileEmail">—</p>
+          <div class="profile-badges">
+            <span class="badge badge-green"><i class="fa-solid fa-check"></i> Verified</span>
+            <span class="badge badge-blue"><i class="fa-solid fa-circle-dot" style="font-size:.5rem"></i> Active</span>
+            <span class="badge badge-purple"><i class="fa-solid fa-key"></i> JWT Auth</span>
+            <span class="badge badge-orange"><i class="fa-brands fa-node-js"></i> Node.js API</span>
+          </div>
+        </div>
+        <div style="margin-left:auto;text-align:right;flex-shrink:0">
+          <div style="font-size:.7rem;color:var(--text3);margin-bottom:4px">Session greeting</div>
+          <div style="font-size:1.1rem;font-weight:700;font-family:var(--fw-head)" id="greetingText">—</div>
+        </div>
+      </div>
+
+      <!-- Stat cards -->
+      <div class="g4" style="margin-bottom:18px">
+        <div class="stat-card">
+          <div class="stat-icon si-green"><i class="fa-solid fa-check-double"></i></div>
+          <div class="stat-body">
+            <div class="stat-lbl">Token Status</div>
+            <div class="stat-val">Active</div>
+            <div class="stat-note">Verified &amp; valid</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon si-cyan"><i class="fa-solid fa-clock"></i></div>
+          <div class="stat-body">
+            <div class="stat-lbl">Token Expires</div>
+            <div class="stat-val" id="statExpiry">—</div>
+            <div class="stat-note">From issue time</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon si-purple"><i class="fa-solid fa-calendar-days"></i></div>
+          <div class="stat-body">
+            <div class="stat-lbl">Member Since</div>
+            <div class="stat-val" id="statJoined">—</div>
+            <div class="stat-note">Account age</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon si-orange"><i class="fa-solid fa-shield-halved"></i></div>
+          <div class="stat-body">
+            <div class="stat-lbl">Auth Method</div>
+            <div class="stat-val">JWT Bearer</div>
+            <div class="stat-note">Stateless token</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data card -->
+      <div class="data-card">
+        <div style="font-size:.78rem;font-weight:700;margin-bottom:14px;color:var(--text2);letter-spacing:.04em;text-transform:uppercase">
+          <i class="fa-solid fa-database" style="margin-right:6px;color:var(--accent)"></i>MongoDB Document (password excluded)
+        </div>
+        <div class="data-row">
+          <div class="data-key"><i class="fa-solid fa-user"></i> Full Name</div>
+          <div class="data-val" id="infoName">—</div>
+        </div>
+        <div class="data-row">
+          <div class="data-key"><i class="fa-solid fa-envelope"></i> Email</div>
+          <div class="data-val" id="infoEmail">—</div>
+        </div>
+        <div class="data-row">
+          <div class="data-key"><i class="fa-solid fa-fingerprint"></i> User ID</div>
+          <div class="data-val mono" id="infoId">—</div>
+        </div>
+        <div class="data-row">
+          <div class="data-key"><i class="fa-solid fa-calendar-plus"></i> Created</div>
+          <div class="data-val" id="infoCreated">—</div>
+        </div>
+        <div class="data-row">
+          <div class="data-key"><i class="fa-solid fa-pen-to-square"></i> Updated</div>
+          <div class="data-val" id="infoUpdated">—</div>
+        </div>
+        <div class="data-row">
+          <div class="data-key"><i class="fa-solid fa-circle-dot"></i> Status</div>
+          <div class="data-val"><span class="badge badge-green"><i class="fa-solid fa-circle" style="font-size:.45rem"></i> Active</span></div>
+        </div>
+        <div class="data-row">
+          <div class="data-key"><i class="fa-solid fa-lock"></i> Password</div>
+          <div class="data-val"><span style="color:var(--text3)">bcrypt hash — never returned by API</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ JWT INSPECTOR PANEL ═══ -->
+    <section class="panel" id="panel-jwt">
+      <div class="panel-heading">JWT Inspector</div>
+      <div class="panel-sub">Your token decoded. Three parts: header, payload, signature — just like <strong>jwt.io</strong>.</div>
+
+      <div class="data-card" style="margin-bottom:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:.78rem;font-weight:700;color:var(--text2);letter-spacing:.04em;text-transform:uppercase">
+            <i class="fa-solid fa-key" style="margin-right:6px;color:var(--yellow)"></i>Raw JWT Token
+          </div>
+          <button class="btn-copy" id="copyJwtBtn"><i class="fa-solid fa-copy"></i> Copy</button>
+        </div>
+        <div class="jwt-raw" id="jwtRaw">—</div>
+        <div style="display:flex;gap:14px;margin-top:10px;font-size:.72rem;color:var(--text3)">
+          <span><span style="color:#ff6b6b">■</span> Header</span>
+          <span><span style="color:#ffd166">■</span> Payload</span>
+          <span><span style="color:#06d6a0">■</span> Signature</span>
+        </div>
+      </div>
+
+      <!-- 3 columns -->
+      <div class="jwt-cols">
+        <!-- Header -->
+        <div class="jwt-col">
+          <div class="jwt-col-title jt-red">
+            <i class="fa-solid fa-file-code"></i> Header
+          </div>
+          <div class="jwt-field">
+            <div class="jwt-field-key"><i class="fa-solid fa-circle-info"></i> alg</div>
+            <div class="jwt-field-val" id="jwtAlg">HS256</div>
+            <div class="jwt-field-note">HMAC-SHA256 signing algorithm</div>
+          </div>
+          <div class="jwt-field">
+            <div class="jwt-field-key"><i class="fa-solid fa-tag"></i> typ</div>
+            <div class="jwt-field-val">JWT</div>
+            <div class="jwt-field-note">Token type identifier</div>
+          </div>
+        </div>
+
+        <!-- Payload -->
+        <div class="jwt-col">
+          <div class="jwt-col-title jt-yellow">
+            <i class="fa-solid fa-box-open"></i> Payload (Claims)
+          </div>
+          <div class="jwt-field">
+            <div class="jwt-field-key"><i class="fa-solid fa-fingerprint"></i> id (sub)</div>
+            <div class="jwt-field-val mono" id="jwtSub">—</div>
+            <div class="jwt-field-note">Subject — your MongoDB user ID</div>
+          </div>
+          <div class="jwt-field">
+            <div class="jwt-field-key"><i class="fa-solid fa-envelope"></i> email</div>
+            <div class="jwt-field-val" id="jwtEmail">—</div>
+            <div class="jwt-field-note">Custom claim added at login</div>
+          </div>
+          <div class="jwt-field">
+            <div class="jwt-field-key"><i class="fa-solid fa-calendar-check"></i> iat</div>
+            <div class="jwt-field-val" id="jwtIat">—</div>
+            <div class="jwt-field-note">Issued At — Unix timestamp</div>
+          </div>
+          <div class="jwt-field">
+            <div class="jwt-field-key"><i class="fa-solid fa-hourglass-end"></i> exp</div>
+            <div class="jwt-field-val" id="jwtExp">—</div>
+            <div class="jwt-field-note">Expiry — server rejects after this</div>
+          </div>
+        </div>
+
+        <!-- Signature -->
+        <div class="jwt-col">
+          <div class="jwt-col-title jt-green">
+            <i class="fa-solid fa-stamp"></i> Signature
+          </div>
+          <div class="jwt-field">
+            <div class="jwt-field-key"><i class="fa-solid fa-lock"></i> Algorithm</div>
+            <div class="jwt-field-val">HMAC-SHA256</div>
+          </div>
+          <div class="jwt-field">
+            <div class="jwt-field-key"><i class="fa-solid fa-key"></i> Secret</div>
+            <div class="jwt-field-val" style="color:var(--text3)">process.env.JWT_SECRET</div>
+            <div class="jwt-field-note">Stored server-side only — never exposed</div>
+          </div>
+          <div class="jwt-field">
+            <div class="jwt-field-key"><i class="fa-solid fa-code"></i> Formula</div>
+            <div class="jwt-field-val" style="font-size:.68rem;line-height:1.6;color:var(--text2)">
+              HMAC_SHA256(<br>
+              &nbsp;&nbsp;base64(header) + "." +<br>
+              &nbsp;&nbsp;base64(payload),<br>
+              &nbsp;&nbsp;secret<br>
+              )
+            </div>
+          </div>
+          <div class="jwt-field">
+            <div class="jwt-field-key"><i class="fa-solid fa-circle-check"></i> Purpose</div>
+            <div class="jwt-field-val" style="color:var(--text2);font-size:.73rem;line-height:1.5">
+              Verifies the token wasn't tampered with. Any change to header or payload invalidates the signature.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Expiry countdown -->
+      <div class="expiry-card">
+        <div class="expiry-top">
+          <div>
+            <div class="expiry-lbl"><i class="fa-solid fa-hourglass-half" style="margin-right:5px;color:var(--accent)"></i> Token Lifetime</div>
+            <div class="expiry-meta" id="expiryMeta">Issued: — &nbsp;|&nbsp; Expires: —</div>
+          </div>
+          <div class="expiry-timer" id="expiryTimer">—</div>
+        </div>
+        <div class="expiry-track">
+          <div class="expiry-fill" id="expiryFill" style="width:100%"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ SESSION PANEL ═══ -->
+    <section class="panel" id="panel-session">
+      <div class="panel-heading">Session &amp; Storage</div>
+      <div class="panel-sub">Where your token lives, how long your session has been active, and why each storage option matters.</div>
+
+      <!-- Storage comparison -->
+      <div style="font-size:.85rem;font-weight:700;margin-bottom:12px;color:var(--text2)">
+        <i class="fa-solid fa-hard-drive" style="margin-right:6px;color:var(--accent)"></i>Token Storage Options
+      </div>
+      <div class="storage-grid" style="margin-bottom:24px">
+        <div class="storage-card current">
+          <div class="storage-current-tag">Currently Used</div>
+          <h4><i class="fa-solid fa-browser"></i> localStorage</h4>
+          <p>Persists across browser sessions. Accessible via JS. Origin-scoped. Good for long-lived, non-sensitive tokens.</p>
+          <div class="pro-con">
+            <div class="pro"><i class="fa-solid fa-plus"></i> Survives tab/browser close</div>
+            <div class="pro"><i class="fa-solid fa-plus"></i> Simple to read/write</div>
+            <div class="con"><i class="fa-solid fa-minus"></i> XSS attack surface</div>
+            <div class="con"><i class="fa-solid fa-minus"></i> Not sent automatically</div>
+          </div>
+        </div>
+        <div class="storage-card">
+          <h4><i class="fa-solid fa-hourglass"></i> sessionStorage</h4>
+          <p>Cleared when tab/browser closes. Per-tab isolation. Better than localStorage for sensitive data.</p>
+          <div class="pro-con">
+            <div class="pro"><i class="fa-solid fa-plus"></i> Auto-cleared on close</div>
+            <div class="pro"><i class="fa-solid fa-plus"></i> Tab-isolated</div>
+            <div class="con"><i class="fa-solid fa-minus"></i> Lost on close</div>
+            <div class="con"><i class="fa-solid fa-minus"></i> Still JS-accessible</div>
+          </div>
+        </div>
+        <div class="storage-card">
+          <h4><i class="fa-solid fa-cookie-bite"></i> HttpOnly Cookie</h4>
+          <p>Set by the server. Inaccessible from JS. Sent automatically. The <strong>gold standard</strong> for auth tokens.</p>
+          <div class="pro-con">
+            <div class="pro"><i class="fa-solid fa-plus"></i> JS cannot read it (XSS safe)</div>
+            <div class="pro"><i class="fa-solid fa-plus"></i> Auto-sent with requests</div>
+            <div class="con"><i class="fa-solid fa-minus"></i> CSRF risk (mitigated by SameSite)</div>
+            <div class="con"><i class="fa-solid fa-minus"></i> Requires backend setup</div>
+          </div>
+        </div>
+        <div class="storage-card">
+          <h4><i class="fa-solid fa-memory"></i> In-Memory (JS var)</h4>
+          <p>Held in a JS variable. Cleared on refresh. Most secure from XSS but lost easily.</p>
+          <div class="pro-con">
+            <div class="pro"><i class="fa-solid fa-plus"></i> Never persisted to disk</div>
+            <div class="pro"><i class="fa-solid fa-plus"></i> Most XSS-resistant</div>
+            <div class="con"><i class="fa-solid fa-minus"></i> Lost on refresh</div>
+            <div class="con"><i class="fa-solid fa-minus"></i> Needs refresh-token strategy</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Browser & Session info -->
+      <div style="font-size:.85rem;font-weight:700;margin-bottom:12px;color:var(--text2)">
+        <i class="fa-solid fa-display" style="margin-right:6px;color:var(--accent)"></i>Your Current Session
+      </div>
+      <div class="browser-grid" style="margin-bottom:18px">
+        <div class="info-tile">
+          <div class="lbl"><i class="fa-solid fa-globe" style="margin-right:4px"></i>Browser</div>
+          <div class="val" id="sessionBrowser">—</div>
+        </div>
+        <div class="info-tile">
+          <div class="lbl"><i class="fa-brands fa-windows" style="margin-right:4px"></i>Operating System</div>
+          <div class="val" id="sessionOS">—</div>
+        </div>
+        <div class="info-tile">
+          <div class="lbl"><i class="fa-solid fa-clock" style="margin-right:4px"></i>Login Time</div>
+          <div class="val" id="sessionLoginTime">—</div>
+        </div>
+        <div class="info-tile">
+          <div class="lbl"><i class="fa-solid fa-stopwatch" style="margin-right:4px"></i>Session Active For</div>
+          <div class="val" id="sessionDuration">—</div>
+        </div>
+        <div class="info-tile">
+          <div class="lbl"><i class="fa-solid fa-display" style="margin-right:4px"></i>Screen Resolution</div>
+          <div class="val" id="sessionScreen">—</div>
+        </div>
+        <div class="info-tile">
+          <div class="lbl"><i class="fa-solid fa-hard-drive" style="margin-right:4px"></i>Token Stored In</div>
+          <div class="val"><span class="badge badge-blue">localStorage</span></div>
+        </div>
+      </div>
+
+      <!-- Token in storage -->
+      <div class="data-card">
+        <div style="font-size:.78rem;font-weight:700;margin-bottom:12px;color:var(--text2);letter-spacing:.04em;text-transform:uppercase">
+          <i class="fa-solid fa-key" style="margin-right:6px;color:var(--yellow)"></i>localStorage['token'] — raw value
+        </div>
+        <div class="jwt-raw" id="sessionTokenDisplay" style="max-height:90px;overflow:hidden;font-size:.68rem">—</div>
+        <div style="display:flex;justify-content:flex-end;margin-top:10px;gap:8px">
+          <button class="btn-copy" id="sessionCopyBtn"><i class="fa-solid fa-copy"></i> Copy Token</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ SECURITY PANEL ═══ -->
+    <section class="panel" id="panel-security">
+      <div class="panel-heading">Security Info</div>
+      <div class="panel-sub">How this app protects your data — password hashing, token verification, and the full auth flow.</div>
+
+      <!-- bcrypt section -->
+      <div class="data-card" style="margin-bottom:18px">
+        <div style="font-size:.85rem;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px">
+          <i class="fa-solid fa-shield-halved" style="color:var(--green)"></i> Password Hashing with bcrypt
+        </div>
+        <p style="font-size:.79rem;color:var(--text2);line-height:1.55;margin-bottom:12px">
+          Your password is <strong>never</strong> stored as plain text. The server uses <code>bcrypt.genSalt(10)</code>
+          and <code>bcrypt.hash()</code> to produce a one-way hash. Even if the database is compromised, 
+          passwords remain protected. A real bcrypt hash looks like this:
+        </p>
+        <div class="bcrypt-box">
+          <span class="bcrypt-pfx">$2a$</span><span class="bcrypt-cost">10$</span><span class="bcrypt-salt">N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy</span>
+        </div>
+        <div style="display:flex;gap:20px;margin-top:12px;flex-wrap:wrap">
+          <div style="font-size:.72rem"><span style="color:var(--yellow)">$2a$</span> — bcrypt version</div>
+          <div style="font-size:.72rem"><span style="color:var(--accent)">10$</span> — cost factor (2¹⁰ = 1024 rounds)</div>
+          <div style="font-size:.72rem"><span style="color:var(--accent2)">Next 22 chars</span> — random salt (unique per hash)</div>
+          <div style="font-size:.72rem"><span style="color:var(--green)">Remaining</span> — hashed password</div>
+        </div>
+      </div>
+
+      <!-- Auth flow diagram -->
+      <div class="data-card" style="margin-bottom:18px">
+        <div style="font-size:.85rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px">
+          <i class="fa-solid fa-diagram-project" style="color:var(--accent)"></i> Complete Auth Flow
+        </div>
+        <div class="auth-flow">
+          <div class="flow-node">
+            <div class="flow-box">🖥️</div>
+            <div class="flow-lbl">Browser</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">
+            <div class="flow-box">📤</div>
+            <div class="flow-lbl">POST /login</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">
+            <div class="flow-box">⚙️</div>
+            <div class="flow-lbl">Middleware</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">
+            <div class="flow-box">🗄️</div>
+            <div class="flow-lbl">MongoDB</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">
+            <div class="flow-box">🔐</div>
+            <div class="flow-lbl">bcrypt verify</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">
+            <div class="flow-box">🪙</div>
+            <div class="flow-lbl">JWT signed</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">
+            <div class="flow-box">💾</div>
+            <div class="flow-lbl">localStorage</div>
+          </div>
+        </div>
+        <div style="font-size:.72rem;color:var(--text3);margin-top:8px;text-align:center">
+          Protected routes: Browser sends <code>Authorization: Bearer &lt;token&gt;</code> → Middleware verifies signature → Controller runs
+        </div>
+      </div>
+
+      <!-- Security checklist -->
+      <div style="font-size:.85rem;font-weight:700;margin-bottom:12px;color:var(--text2)">
+        <i class="fa-solid fa-list-check" style="margin-right:6px;color:var(--accent)"></i>Security Features in This App
+      </div>
+      <div class="sec-tip">
+        <div class="sec-tip-icon si-green"><i class="fa-solid fa-lock"></i></div>
+        <div>
+          <h4>Passwords Hashed with bcrypt</h4>
+          <p>Cost factor 10 makes brute-force attacks computationally expensive. Even database leaks won't expose real passwords.</p>
+        </div>
+      </div>
+      <div class="sec-tip">
+        <div class="sec-tip-icon si-cyan"><i class="fa-solid fa-stamp"></i></div>
+        <div>
+          <h4>JWT Signature Verification</h4>
+          <p>Every protected API call verifies the token's HMAC-SHA256 signature using the server-side secret. Tampered tokens are rejected.</p>
+        </div>
+      </div>
+      <div class="sec-tip">
+        <div class="sec-tip-icon si-purple"><i class="fa-solid fa-hourglass-end"></i></div>
+        <div>
+          <h4>Token Expiry (1 Day)</h4>
+          <p>JWT tokens include an <code>exp</code> claim. The server rejects expired tokens automatically, limiting the window for token misuse.</p>
+        </div>
+      </div>
+      <div class="sec-tip">
+        <div class="sec-tip-icon si-yellow"><i class="fa-solid fa-eye-slash"></i></div>
+        <div>
+          <h4>Password Excluded from API Responses</h4>
+          <p>The profile endpoint uses <code>.select('-password')</code> — your hashed password never leaves the server in any response.</p>
+        </div>
+      </div>
+      <div class="sec-tip">
+        <div class="sec-tip-icon si-orange"><i class="fa-solid fa-shield-halved"></i></div>
+        <div>
+          <h4>401 on Invalid/Expired Tokens</h4>
+          <p>The <code>authMiddleware</code> catches missing, malformed, or expired tokens and returns 401, preventing unauthorized access.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ API PANEL ═══ -->
+    <section class="panel" id="panel-api">
+      <div class="panel-heading">API Reference</div>
+      <div class="panel-sub">All endpoints in this app — methods, auth requirements, request/response shapes.</div>
+
+      <!-- Endpoint 1 -->
+      <div class="api-block">
+        <div class="api-block-header">
+          <span class="method-tag mt-post">POST</span>
+          <span class="api-path">/api/users/register</span>
+          <span class="api-desc">Create a new account</span>
+          <span class="badge badge-green"><i class="fa-solid fa-unlock"></i> Public</span>
+        </div>
+        <div class="api-block-body">
+          <div class="g2">
+            <div>
+              <div style="font-size:.7rem;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Request Body</div>
+              <pre><span class="kw">{</span>
+  <span class="str">"name"</span>:     <span class="str">"Saurabh Raj"</span>,
+  <span class="str">"email"</span>:    <span class="str">"you@example.com"</span>,
+  <span class="str">"password"</span>: <span class="str">"secret123"</span>
+<span class="kw">}</span></pre>
+            </div>
+            <div>
+              <div style="font-size:.7rem;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Response 201</div>
+              <pre><span class="kw">{</span>
+  <span class="str">"message"</span>: <span class="str">"User registered successfully"</span>,
+  <span class="str">"user"</span>: <span class="kw">{</span>
+    <span class="str">"id"</span>: <span class="str">"64abc123..."</span>,
+    <span class="str">"name"</span>: <span class="str">"Saurabh Raj"</span>,
+    <span class="str">"email"</span>: <span class="str">"you@example.com"</span>
+  <span class="kw">}</span>
+<span class="kw">}</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Endpoint 2 -->
+      <div class="api-block">
+        <div class="api-block-header">
+          <span class="method-tag mt-post">POST</span>
+          <span class="api-path">/api/users/login</span>
+          <span class="api-desc">Authenticate &amp; get JWT</span>
+          <span class="badge badge-green"><i class="fa-solid fa-unlock"></i> Public</span>
+        </div>
+        <div class="api-block-body">
+          <div class="g2">
+            <div>
+              <div style="font-size:.7rem;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Request Body</div>
+              <pre><span class="kw">{</span>
+  <span class="str">"email"</span>:    <span class="str">"you@example.com"</span>,
+  <span class="str">"password"</span>: <span class="str">"secret123"</span>
+<span class="kw">}</span></pre>
+            </div>
+            <div>
+              <div style="font-size:.7rem;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Response 200</div>
+              <pre><span class="kw">{</span>
+  <span class="str">"message"</span>: <span class="str">"Login successful"</span>,
+  <span class="str">"token"</span>:   <span class="str">"eyJhbGci..."</span>  <span class="cmt">// JWT</span>
+<span class="kw">}</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Endpoint 3 -->
+      <div class="api-block">
+        <div class="api-block-header">
+          <span class="method-tag mt-get">GET</span>
+          <span class="api-path">/api/users/profile</span>
+          <span class="api-desc">Fetch authenticated user</span>
+          <span class="api-auth-tag"><i class="fa-solid fa-lock"></i> Bearer Token Required</span>
+        </div>
+        <div class="api-block-body">
+          <div class="g2">
+            <div>
+              <div style="font-size:.7rem;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Request Headers</div>
+              <pre><span class="str">Authorization</span>: <span class="str">Bearer eyJhbGci...</span>
+<span class="str">Content-Type</span>:  <span class="str">application/json</span></pre>
+            </div>
+            <div>
+              <div style="font-size:.7rem;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Response 200</div>
+              <pre><span class="kw">{</span>
+  <span class="str">"user"</span>: <span class="kw">{</span>
+    <span class="str">"_id"</span>:       <span class="str">"64abc123..."</span>,
+    <span class="str">"name"</span>:      <span class="str">"Saurabh"</span>,
+    <span class="str">"email"</span>:     <span class="str">"you@example.com"</span>,
+    <span class="str">"createdAt"</span>: <span class="str">"2025-06-01T..."</span>
+  <span class="kw">}</span>
+<span class="kw">}</span></pre>
+            </div>
+          </div>
+          <div style="margin-top:12px;padding:11px 15px;background:var(--bg2);border-radius:8px;font-size:.73rem;color:var(--text2);line-height:1.55">
+            <i class="fa-solid fa-circle-info" style="margin-right:5px;color:var(--accent)"></i>
+            The <code>authMiddleware</code> runs <strong>before</strong> this controller. It extracts &amp; verifies the Bearer token via <code>jwt.verify(token, process.env.JWT_SECRET)</code>. On success, <code>req.user</code> is populated with the decoded payload <code>{ id, email }</code>.
+          </div>
+        </div>
+      </div>
+
+      <!-- Error codes -->
+      <div class="data-card" style="margin-top:4px">
+        <div style="font-size:.78rem;font-weight:700;margin-bottom:12px;color:var(--text2);letter-spacing:.04em;text-transform:uppercase">
+          <i class="fa-solid fa-triangle-exclamation" style="margin-right:6px;color:var(--yellow)"></i>Common Error Responses
+        </div>
+        <div class="data-row">
+          <div class="data-key" style="color:var(--yellow)"><i class="fa-solid fa-hashtag"></i> 400</div>
+          <div class="data-val">Bad Request — User already exists, or invalid email/password combination</div>
+        </div>
+        <div class="data-row">
+          <div class="data-key" style="color:var(--red)"><i class="fa-solid fa-hashtag"></i> 401</div>
+          <div class="data-val">Unauthorized — No token provided, token is malformed, or token has expired</div>
+        </div>
+        <div class="data-row">
+          <div class="data-key" style="color:var(--red)"><i class="fa-solid fa-hashtag"></i> 500</div>
+          <div class="data-val">Server Error — Database connection failed, or unexpected runtime error</div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /panels -->
+</div><!-- /dash-main -->
+
+<!-- Toast -->
+<div class="toast" id="toast" role="alert">
+  <div class="toast-dot" id="toastDot"></div>
+  <span id="toastMsg"></span>
+</div>
+
+<script src="js/dashboard.js"></script>
+</body>
+</html>

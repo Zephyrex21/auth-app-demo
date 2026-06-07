@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZephyrAuth — Sign In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<canvas id="bgCanvas"></canvas>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <div class="nav-brand-icon"><i class="fa-solid fa-shield-halved"></i></div>
+    Zephyr<span class="hl">Auth</span>
+  </div>
+  <div class="nav-links">
+    <a href="learn.html" class="nav-link"><i class="fa-solid fa-book-open"></i> Learn</a>
+  </div>
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+      <i class="fa-solid fa-moon" id="moonIcon"></i>
+      <i class="fa-solid fa-sun" id="sunIcon" style="display:none"></i>
+    </button>
+  </div>
+</nav>
+
+<!-- Auth wrapper -->
+<div class="auth-wrapper">
+  <div class="auth-layout">
+
+    <!-- Auth Card -->
+    <div class="auth-card page-enter">
+      <div class="auth-brand">
+        <div class="auth-brand-icon"><i class="fa-solid fa-shield-halved"></i></div>
+        <span class="auth-brand-name">Zephyr<span class="hl">Auth</span></span>
+      </div>
+      <h1 class="auth-title">Welcome back</h1>
+      <p class="auth-sub">Sign in or create an account to explore authentication concepts live.</p>
+
+      <!-- Tab bar -->
+      <div class="tab-bar" id="tabBar">
+        <div class="tab-pill" id="tabPill"></div>
+        <button class="tab-btn active" data-tab="login">Sign In</button>
+        <button class="tab-btn" data-tab="register">Create Account</button>
+      </div>
+
+      <!-- Login Form -->
+      <form class="form-panel" id="loginForm" novalidate>
+        <div class="field">
+          <label class="field-label" for="loginEmail">
+            <i class="fa-solid fa-envelope" style="font-size:.75rem;margin-right:5px"></i>Email address
+          </label>
+          <input class="field-input" type="email" id="loginEmail"
+                 placeholder="you@example.com" autocomplete="email">
+          <span class="field-err" id="loginEmailErr"></span>
+        </div>
+        <div class="field">
+          <label class="field-label" for="loginPassword">
+            <i class="fa-solid fa-lock" style="font-size:.75rem;margin-right:5px"></i>Password
+          </label>
+          <div class="input-wrap">
+            <input class="field-input" type="password" id="loginPassword"
+                   placeholder="••••••••" autocomplete="current-password">
+            <button type="button" class="eye-btn" data-for="loginPassword" aria-label="Show password">
+              <i class="fa-solid fa-eye eye-show"></i>
+              <i class="fa-solid fa-eye-slash eye-hide" style="display:none"></i>
+            </button>
+          </div>
+          <span class="field-err" id="loginPwErr"></span>
+        </div>
+        <button type="submit" class="btn-primary" id="loginBtn" style="margin-top:6px">
+          <span class="btn-label"><i class="fa-solid fa-right-to-bracket"></i> Sign In</span>
+          <i class="fa-solid fa-circle-notch btn-spinner" style="display:none"></i>
+        </button>
+      </form>
+
+      <!-- Register Form -->
+      <form class="form-panel" id="registerForm" novalidate style="display:none">
+        <div class="field">
+          <label class="field-label" for="regName">
+            <i class="fa-solid fa-user" style="font-size:.75rem;margin-right:5px"></i>Full name
+          </label>
+          <input class="field-input" type="text" id="regName"
+                 placeholder="Your Name" autocomplete="name">
+          <span class="field-err" id="regNameErr"></span>
+        </div>
+        <div class="field">
+          <label class="field-label" for="regEmail">
+            <i class="fa-solid fa-envelope" style="font-size:.75rem;margin-right:5px"></i>Email address
+          </label>
+          <input class="field-input" type="email" id="regEmail"
+                 placeholder="you@example.com" autocomplete="email">
+          <span class="field-err" id="regEmailErr"></span>
+        </div>
+        <div class="field">
+          <label class="field-label" for="regPassword">
+            <i class="fa-solid fa-key" style="font-size:.75rem;margin-right:5px"></i>Password
+          </label>
+          <div class="input-wrap">
+            <input class="field-input" type="password" id="regPassword"
+                   placeholder="Min. 5 characters" autocomplete="new-password">
+            <button type="button" class="eye-btn" data-for="regPassword" aria-label="Show password">
+              <i class="fa-solid fa-eye eye-show"></i>
+              <i class="fa-solid fa-eye-slash eye-hide" style="display:none"></i>
+            </button>
+          </div>
+          <div class="pw-strength">
+            <div class="pw-bar" id="pwBar1"></div>
+            <div class="pw-bar" id="pwBar2"></div>
+            <div class="pw-bar" id="pwBar3"></div>
+          </div>
+          <div class="pw-label" id="pwLabel"></div>
+          <span class="field-err" id="regPwErr"></span>
+        </div>
+        <button type="submit" class="btn-primary" id="registerBtn" style="margin-top:6px">
+          <span class="btn-label"><i class="fa-solid fa-user-plus"></i> Create Account</span>
+          <i class="fa-solid fa-circle-notch btn-spinner" style="display:none"></i>
+        </button>
+      </form>
+    </div>
+
+    <!-- Side info panel -->
+    <div class="auth-side page-enter" style="animation-delay:.12s">
+      <div class="chip-label" style="margin-bottom:10px;color:var(--accent)">
+        <i class="fa-solid fa-route"></i>&nbsp; HOW IT WORKS
+      </div>
+      <h2 class="auth-side-heading">Your auth flow, live &amp; explained</h2>
+      <div class="flow-step">
+        <div class="flow-num">01</div>
+        <div class="flow-body">
+          <h4><i class="fa-solid fa-user-plus" style="font-size:.78rem;margin-right:4px;color:var(--accent)"></i> Register</h4>
+          <p>Your password is hashed with <strong>bcrypt</strong> (cost=10) before storing in MongoDB. Plain text is <em>never</em> saved.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">02</div>
+        <div class="flow-body">
+          <h4><i class="fa-solid fa-key" style="font-size:.78rem;margin-right:4px;color:var(--accent)"></i> Verify &amp; Issue JWT</h4>
+          <p>On login, bcrypt compares hashes. If matched, the server signs a <strong>JWT</strong> containing your user ID &amp; email — expires in 1 day.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">03</div>
+        <div class="flow-body">
+          <h4><i class="fa-solid fa-database" style="font-size:.78rem;margin-right:4px;color:var(--accent)"></i> Client-side Storage</h4>
+          <p>The JWT is saved in <code>localStorage</code>. Explore the tradeoffs vs cookies &amp; sessions on your dashboard.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">04</div>
+        <div class="flow-body">
+          <h4><i class="fa-solid fa-shield-halved" style="font-size:.78rem;margin-right:4px;color:var(--accent)"></i> Protected Routes</h4>
+          <p>Every request to a guarded API sends <code>Authorization: Bearer &lt;token&gt;</code>. The middleware verifies the signature before access is granted.</p>
+        </div>
+      </div>
+      <a href="learn.html" class="btn-ghost" style="margin-top:10px;display:inline-flex">
+        <i class="fa-solid fa-book-open"></i> Deep dive into auth concepts
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast" role="alert">
+  <div class="toast-dot" id="toastDot"></div>
+  <span id="toastMsg"></span>
+</div>
+
+<script src="js/auth.js"></script>
+</body>
+</html>

@@ -81,6 +81,4 @@ MONGO_URI=mongodb://localhost:27017/authapp
 JWT_SECRET=any_random_string
 ```
 
----
-
 *Built for learning purposes — Saurabh Raj Shekhar*
